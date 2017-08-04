@@ -66,8 +66,13 @@
                 //get the change from last position to this position
                 var deltaX = last_position.x - e.clientX,
                     deltaY = last_position.y - e.clientY;
-                
-                if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX > 0) {
+                  console.log(deltaX, "= deltaX ", deltaY, "= deltaY");
+		  var localRowNumber = cur_frame / settings.framesX;
+		  var firstElementCurrentRow = settings.framesX * (localRowNumber - 1) + 1;
+                  if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX > 0) {
+		      if (cur_frame == firstElementCurrentRow) {
+			  cur_frame = localRowNumber * settings.framesX;
+		      }
                   if(cur_frame > 1) {
                     setTimeout(function() {
                        var img_name = src.split('/')[src.split('/').length-1]
@@ -79,12 +84,14 @@
                     setTimeout(function() {
                       var img_name = src.split('/')[src.split('/').length-1]
                       var directory = src.split('/').slice(0, -1).join("/")
-                      var new_frame = directory + "/" + img_name.split('_')[0] + "_" + (parseInt(settings.frames)) + "." + img_name.split('.')[1]
+                      var new_frame = directory + "/" + img_name.split('_')[0] + "_" + (parseInt(settings.framesX)) + "." + img_name.split('.')[1]
                       $el.find("img.main-frame").attr("src", new_frame)
-                    },settings.speed)
-                   
+                    },settings.speed)                   
                   }
-                } else if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX < 0) {
+                  } else if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX < 0) {
+		      if (cur_frame % settings.framesX == 0) {
+			  cur_frame = firstElementCurrentRow;
+		      }
                   if(cur_frame < settings.frames) {
                     setTimeout(function() {
                       var img_name = src.split('/')[src.split('/').length-1]
@@ -101,6 +108,27 @@
                     },settings.speed)
                   }
                 }
+                //мои доделки для оси Y
+                else if (Math.abs(deltaY) > Math.abs(deltaX) && deltaY < 0) {
+                  if((cur_frame < settings.frames) && (parseInt(cur_frame) - settings.framesX >0)) {
+                    setTimeout(function() {
+                      var img_name = src.split('/')[src.split('/').length-1]
+                      var directory = src.split('/').slice(0, -1).join("/")
+                      var new_frame = directory + "/" + img_name.split('_')[0] + "_" + (parseInt(cur_frame) - settings.framesX) + "." + img_name.split('.')[1]
+                        $el.find("img.main-frame").attr("src", new_frame)
+                    },settings.speed)
+                  } 
+                }
+                if (Math.abs(deltaY) > Math.abs(deltaX) && deltaY > 0) {
+                  if(cur_frame > 1 && (parseInt(cur_frame) + settings.framesX  <= settings.frames)) {
+                    setTimeout(function() {
+                       var img_name = src.split('/')[src.split('/').length-1]
+                       var directory = src.split('/').slice(0, -1).join("/")
+                       var new_frame = directory + "/" + img_name.split('_')[0] + "_" + (parseInt(cur_frame) + settings.framesX) + "." + img_name.split('.')[1]
+                        $el.find("img.main-frame").attr("src", new_frame)
+                    },settings.speed)
+                  } 
+                } 
               }    
                   
               last_position = {
